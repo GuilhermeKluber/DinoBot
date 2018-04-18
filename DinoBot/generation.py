@@ -50,8 +50,8 @@ class Generation:
     def keep_best_genomes(self):
         self.__genomes.sort(key=lambda x: x.fitness, reverse=True)
         self.__genomes = self.__genomes[:4]
-        self.csv_writer.writerow([self.__genomes[0].W1[0],self.__genomes[0].W1[1],self.__genomes[0].W1[2],self.__genomes[0].W1[3],self.__genomes[0].W1[4]
-                        self.__genomes[0].W2[0],self.__genomes[0].W2[1],self.__genomes[0].W2[2],self.__genomes[0].W2[3],self.__genomes[0].W2[4]
+        self.csv_writer.writerow([self.__genomes[0].W1[0],self.__genomes[0].W1[1],self.__genomes[0].W1[2],self.__genomes[0].W1[3],
+                        self.__genomes[0].W2[0],self.__genomes[0].W2[1],self.__genomes[0].W2[2],self.__genomes[0].W2[3],self.__genomes[0].W2[4],
                         self.__genomes[0].fitness])
         self.__best_genomes = self.__genomes[:]
 
