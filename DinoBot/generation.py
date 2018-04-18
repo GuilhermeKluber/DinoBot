@@ -31,8 +31,8 @@ class Generation:
                 if not game_over:
                     start=time.time()
                     obs,game_over = scanner.find_next_obstacle(game_over)
-                    # print("Dist e {} , Largura {} Altura {} Speed e {}".format(1-((373-obs['distance'])/(373)),obs['length']/100,obs['height']/100,obs['speed']/10))
-                    inputs = [1-((373-obs['distance'])/(373)) ,obs['length']/100,obs['height']/100, obs['speed'] / 10]
+                    #print("Dist e {} , Largura {} Altura {} Speed e {}".format(1-((260-obs['distance'])/(260)),obs['length']/100,obs['height']/100,obs['speed']/10))
+                    inputs = [1-((260-obs['distance'])/(360)) ,obs['length']/100,obs['height']/100, obs['speed'] / 10]
                     outputs = genome.forward(np.array(inputs, dtype=float))
                     if outputs[0] > 0.55:
                         pyautogui.keyUp('down')
@@ -51,7 +51,7 @@ class Generation:
         self.__genomes.sort(key=lambda x: x.fitness, reverse=True)
         self.__genomes = self.__genomes[:4]
         self.csv_writer.writerow([self.__genomes[0].W1[0],self.__genomes[0].W1[1],self.__genomes[0].W1[2],self.__genomes[0].W1[3],
-                        self.__genomes[0].W2[0],self.__genomes[0].W2[1],self.__genomes[0].W2[2],self.__genomes[0].W2[3],self.__genomes[0].W2[4],
+                        self.__genomes[0].W2[0],self.__genomes[0].W2[1],self.__genomes[0].W2[2],self.__genomes[0].W2[3],
                         self.__genomes[0].fitness])
         self.__best_genomes = self.__genomes[:]
 

@@ -65,6 +65,8 @@ class Scanner:
         self.last_obstacle = {}
         self.__current_fitness = 0
         self.__change_fitness = False
+        self.inte=0
+        self.hist_color_dino = np.zeros(15)
         self.lx,self.ly,self.rx,self.ry = lx,ly,rx,ry
 
     def find_next_obstacle(self,game_over):
@@ -90,6 +92,35 @@ class Scanner:
         image = pyautogui.screenshot(region=(self.lx,self.ly, self.rx-self.lx+160, self.ry-self.ly-10))
         size = image.size
         DinoColor = image.getpixel((size[0]-40,15))
+        if self.inte == 0:
+            self.hist_color_dino[0]=DinoColor[0]
+            self.inte+=1
+        elif self.inte == self.hist_color_dino.size:
+            self.inte=0
+            self.hist_color_dino[0]=DinoColor[0]
+        else:
+            self.hist_color_dino[self.inte]=DinoColor[0]
+            self.inte+=1
+        self.hist_color_dino.sort()
+        aux=0
+        aux2=0
+        DinoColor = [0,0,0]
+        DinoColor_aux = [0,0,0]
+        for j in range(1,self.hist_color_dino.size):
+            if self.hist_color_dino[j] == self.hist_color_dino[j-1]:
+                DinoColor[0]=self.hist_color_dino[j-1]
+                DinoColor[1]=self.hist_color_dino[j-1]
+                DinoColor[2]=self.hist_color_dino[j-1]
+                aux+=1
+            elif aux >= aux2:
+                DinoColor_aux[0]=self.hist_color_dino[j-1]
+                DinoColor_aux[1]=self.hist_color_dino[j-1]
+                DinoColor_aux[2]=self.hist_color_dino[j-1]
+                aux2=aux
+                aux=0
+        if aux2 > aux:
+            DinoColor=DinoColor_aux
+
         image = pyautogui.screenshot(region=(self.lx,self.ly, self.rx-self.lx, self.ry-self.ly-10))
         image = np.array(image)
         th = compare(image,DinoColor)
