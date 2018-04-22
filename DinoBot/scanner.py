@@ -66,7 +66,7 @@ class Scanner:
         self.__current_fitness = 0
         self.__change_fitness = False
         self.inte=0
-        self.hist_color_dino = np.zeros(15)
+        self.hist_color_dino = np.zeros(10)
         self.lx,self.ly,self.rx,self.ry = lx,ly,rx,ry
 
     def find_next_obstacle(self,game_over):
@@ -120,7 +120,6 @@ class Scanner:
                 aux=0
         if aux2 > aux:
             DinoColor=DinoColor_aux
-
         image = pyautogui.screenshot(region=(self.lx,self.ly, self.rx-self.lx, self.ry-self.ly-10))
         image = np.array(image)
         th = compare(image,DinoColor)
@@ -134,7 +133,7 @@ class Scanner:
                     if (x > size[0]/2-30) and (y < size[1]-10):
                         game_over=True
                         print("Game Over")
-                        return 1000000,game_over,1000000, 1000000
+                        return 1000000,game_over,0, 0
 
                 if cv2.contourArea(c)>120 and cv2.contourArea(c)<450:
                     if x == size[0]:
@@ -146,10 +145,10 @@ class Scanner:
                         x_aux=x
                         height=size[1]-y
                         count+=1
-            if x_aux > 70 and x < size[0]:
+            if x_aux > 70 and x_aux < size[0]:
                 return (x_aux-70), game_over, length*count, height
 
-        return 1000000,game_over,100000, 100000
+        return 10000000,game_over,0, 0
 
     def reset(self):
         self.last_obstacle = {}

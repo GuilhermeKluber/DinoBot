@@ -13,7 +13,7 @@ class Network:
         self.z2 = np.dot(inputs, self.W1)
         self.a2 = np.tanh(self.z2)
         self.z3 = np.dot(self.a2, self.W2)
-        yHat = np.tanh(self.z3)
+        yHat = self.sigmoid(self.z3)
         return yHat
 
     def sigmoid(self, z):

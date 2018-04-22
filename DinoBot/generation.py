@@ -12,16 +12,18 @@ import time
 class Generation:
     def __init__(self):
         self.__genomes = [Network() for i in range(12)]
-
         self.__best_genomes = []
         self.f = open('regGenome.csv', 'a+')
         self.csv_writer = csv.writer(self.f, delimiter=',')
         #self.csv_writer.writerow(['W1[0]','W1[1]','W1[2]','W1[3]','W1[4]','W2[0]','W2[1]','W2[2]','W2[3]','W1[4]' , 'Fitness'])
         self.f.flush()
 
-    def execute(self,lx,ly,rx,ry):
+    def execute(self,lx,ly,rx,ry,epoch):
         scanner = Scanner(lx,ly,rx,ry)
         show_fitness = [ ]
+        pyautogui.keyDown('ctrl')
+        pyautogui.press('r')
+        pyautogui.keyUp('ctrl')
         for genome in self.__genomes:
             scanner.reset()
             sleep(1)
@@ -32,8 +34,11 @@ class Generation:
                     start=time.time()
                     obs,game_over = scanner.find_next_obstacle(game_over)
                     #print("Dist e {} , Largura {} Altura {} Speed e {}".format(1-((260-obs['distance'])/(260)),obs['length']/100,obs['height']/100,obs['speed']/10))
-                    inputs = [1-((260-obs['distance'])/(360)) ,obs['length']/100,obs['height']/100, obs['speed'] / 10]
+                    inputs = [1-((260-obs['distance'])/(260)) ,obs['length']/100,obs['height']/100, obs['speed'] / 10]
+                    #inputs = [1-((260-obs['distance'])/(360)) ,obs['height']/100, obs['speed'] / 10]
                     outputs = genome.forward(np.array(inputs, dtype=float))
+                    #print(outputs[0])
+                    print("Tempo de processo {}".format(time.time()-start))
                     if outputs[0] > 0.55:
                         pyautogui.keyUp('down')
                         pyautogui.press("space")
@@ -50,7 +55,7 @@ class Generation:
     def keep_best_genomes(self):
         self.__genomes.sort(key=lambda x: x.fitness, reverse=True)
         self.__genomes = self.__genomes[:4]
-        self.csv_writer.writerow([self.__genomes[0].W1[0],self.__genomes[0].W1[1],self.__genomes[0].W1[2],self.__genomes[0].W1[3],
+        self.csv_writer.writerow([self.__genomes[0].W1[0],self.__genomes[0].W1[1],self.__genomes[0].W1[2],self.__genomes[0].W1[2],
                         self.__genomes[0].W2[0],self.__genomes[0].W2[1],self.__genomes[0].W2[2],self.__genomes[0].W2[3],
                         self.__genomes[0].fitness])
         self.__best_genomes = self.__genomes[:]

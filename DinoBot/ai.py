@@ -8,7 +8,7 @@ def main():
     while True:
         epoch=epoch+1
         print("Geracao {}".format(epoch))
-        generation.execute(lx,ly,rx,ry)
+        generation.execute(lx,ly,rx,ry,epoch)
         generation.keep_best_genomes()
         generation.mutations()
 
