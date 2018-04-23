@@ -2,7 +2,7 @@ import numpy as np
 
 class Network:
     def __init__(self):
-        self.input_size = 4
+        self.input_size = 3
         self.hidden_size = 4
         self.output_size = 1
         self.W1 = np.random.randn(self.input_size, self.hidden_size)
