@@ -7,6 +7,7 @@ import numpy as np
 import random
 import copy
 import pyautogui
+import keyboard
 import time
 
 class Generation:
@@ -28,7 +29,8 @@ class Generation:
             scanner.reset()
             sleep(1)
             game_over=False
-            pyautogui.press("space")
+            keyboard.press("space")
+            keyboard.release("space")
             while True:
                 if not game_over:
                     start=time.time()
@@ -38,14 +40,15 @@ class Generation:
                     #inputs = [1-((260-obs['distance'])/(360)) ,obs['height']/100, obs['speed'] / 10]
                     outputs = genome.forward(np.array(inputs, dtype=float))
                     #print(outputs[0])
-                    print("Tempo de processo {}".format(time.time()-start))
                     if outputs[0] > 0.55:
-                        pyautogui.keyUp('down')
-                        pyautogui.press("space")
+                        keyboard.release('down')
+                        keyboard.press("space")
+                        keyboard.release("space")
                     elif outputs[0] < 0.45:
-                        pyautogui.keyDown('down')
+                        keyboard.press('down')
                     else:
-                        pyautogui.keyUp('down')
+                        keyboard.release('down')
+                    print("Tempo {}".format(time.time()-start))
                 else:
                     break
             genome.fitness = scanner.get_fitness()
@@ -54,18 +57,18 @@ class Generation:
 
     def keep_best_genomes(self):
         self.__genomes.sort(key=lambda x: x.fitness, reverse=True)
-        self.__genomes = self.__genomes[:4]
+        self.__genomes = self.__genomes[:6]
         self.csv_writer.writerow([self.__genomes[0].W1[0],self.__genomes[0].W1[1],self.__genomes[0].W1[2],self.__genomes[0].W1[2],
                         self.__genomes[0].W2[0],self.__genomes[0].W2[1],self.__genomes[0].W2[2],self.__genomes[0].W2[3],
                         self.__genomes[0].fitness])
         self.__best_genomes = self.__genomes[:]
 
     def mutations(self):
-        while len(self.__genomes) < 10:
+        while len(self.__genomes) < 26:
             genome1 = random.choice(self.__best_genomes)
             genome2 = random.choice(self.__best_genomes)
             self.__genomes.append(self.mutate(self.cross_over(genome1, genome2)))
-        while len(self.__genomes) < 12:
+        while len(self.__genomes) < 30:
             genome = random.choice(self.__best_genomes)
             self.__genomes.append(self.mutate(genome))
 
