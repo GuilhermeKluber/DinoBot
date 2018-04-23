@@ -124,7 +124,7 @@ class Scanner:
         image = np.array(image)
         th = compare(image,DinoColor)
         x_aux=1000000
-        count=1
+        count=0
         opa, contours, _= cv2.findContours(th,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         if len(contours) > 1:
             for c in contours:

@@ -35,19 +35,17 @@ class Generation:
                 if not game_over:
                     obs,game_over = scanner.find_next_obstacle(game_over)
                     #print("Dist e {} , Largura {} Altura {} Speed e {}".format(1-((260-obs['distance'])/(260)),obs['length']/100,obs['height']/100,obs['speed']/10))
-                    #inputs = [1-((260-obs['distance'])/(260)) ,obs['length']/100,obs['height']/100, obs['speed'] / 10]
-                    inputs = [1-((260-obs['distance'])/(260)) ,obs['height']/100, obs['speed'] / 10]
+                    inputs = [1-((260-obs['distance'])/(260)) ,obs['length']/100,obs['height']/100, obs['speed'] / 10]
+                    #inputs = [1-((260-obs['distance'])/(260)) ,obs['height']/100, obs['speed'] / 10]
                     outputs = genome.forward(np.array(inputs, dtype=float))
                     #print(outputs[0])
                     if outputs[0] > 0.55:
-                        keyboard.release('down')
-                        keyboard.press("space")
+                        pyautogui.keyUp('down')
+                        pyautogui.press('space')
                     elif outputs[0] < 0.45:
-                        keyboard.release("space")
-                        keyboard.press('down')
+                        pyautogui.keyDown('down')
                     else:
-                        keyboard.release('down')
-                        keyboard.release("space")
+                        pyautogui.keyUp('down')
                 else:
                     break
             genome.fitness = scanner.get_fitness()
