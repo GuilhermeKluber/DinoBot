@@ -33,7 +33,6 @@ class Generation:
             keyboard.release("space")
             while True:
                 if not game_over:
-                    start=time.time()
                     obs,game_over = scanner.find_next_obstacle(game_over)
                     #print("Dist e {} , Largura {} Altura {} Speed e {}".format(1-((260-obs['distance'])/(260)),obs['length']/100,obs['height']/100,obs['speed']/10))
                     inputs = [1-((260-obs['distance'])/(260)) ,obs['length']/100,obs['height']/100, obs['speed'] / 10]
@@ -48,7 +47,6 @@ class Generation:
                         keyboard.press('down')
                     else:
                         keyboard.release('down')
-                    print("Tempo {}".format(time.time()-start))
                 else:
                     break
             genome.fitness = scanner.get_fitness()
