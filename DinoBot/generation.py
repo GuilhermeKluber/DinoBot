@@ -12,7 +12,7 @@ import time
 
 class Generation:
     def __init__(self):
-        self.__genomes = [Network() for i in range(12)]
+        self.__genomes = [Network() for i in range(30)]
         self.__best_genomes = []
         self.f = open('regGenome.csv', 'a+')
         self.csv_writer = csv.writer(self.f, delimiter=',')
