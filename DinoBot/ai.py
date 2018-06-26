@@ -1,6 +1,7 @@
 from generation import Generation
 from scanner import get_location
 
+
 def main():
     generation = Generation()
     lx,ly,rx,ry=get_location()

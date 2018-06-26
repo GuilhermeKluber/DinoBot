@@ -46,6 +46,9 @@ def get_location():
         raise Exception("Game not found!")
     ly, ry = ry, ly
     # left, top, right, bottom, t_rex
+    image = pyautogui.screenshot(region=(lx,ly, rx-lx, ry-ly-10))
+    image = np.array(image)
+    #cv2.imwrite("game.jpg",image)
     return lx,ly,rx,ry
 
 def screenshot(x, y, w, h):
@@ -55,18 +58,35 @@ def screenshot(x, y, w, h):
 
     return img
 
-def obstacle(distance, length, speed, time,height):
-    return { 'distance': distance, 'length': length, 'speed': speed, 'time': time,'height':height }
+def obstacle(distance, length, speed, time,height,moviment = None):
+    return { 'distance': distance, 'length': length, 'speed': speed, 'time': time,'height':height,"moviment":moviment }
+
+def moviment_analyzer(DinoColor,image):
+    size = image.size
+    jump_color = image.getpixel((37,122))
+    down_color = image.getpixel((54,92))
+    if jump_color[0] != DinoColor[0]:
+        moviment = 1
+        time.sleep(0.2)
+    elif down_color[0] != DinoColor[0] and jump_color[0] == DinoColor[0]:
+        time.sleep(0.2)
+        moviment = 2
+    else:
+        moviment = 0
+    print(moviment)
+    return moviment
 
 class Scanner:
     def __init__(self,lx,ly,rx,ry):
         self.dino_start = (0, 0)
         self.dino_end = (0, 0)
         self.last_obstacle = {}
+        self.last_speed=0
         self.__current_fitness = 0
         self.__change_fitness = False
         self.inte=0
-        self.hist_color_dino = np.zeros(10)
+        self.hist_color_dino = np.zeros(15)
+        self.last_valid_color=[0,0,0]
         self.lx,self.ly,self.rx,self.ry = lx,ly,rx,ry
 
     def find_next_obstacle(self,game_over):
@@ -78,77 +98,70 @@ class Scanner:
             self.__change_fitness = False
         time = datetime.now()
         delta_dist = 0
-        speed = 0
+        speed = self.last_speed
         if self.last_obstacle:
             delta_dist = self.last_obstacle['distance'] - dist
             speed = (delta_dist / ((time - self.last_obstacle['time']).microseconds)) * 10000
+            if not (speed/10 > 0.1 and speed/10 < 1):
+                speed = self.last_speed
+            else:
+                self.last_speed = speed
         self.last_obstacle = obstacle(dist, length, speed, time,height)
         return self.last_obstacle,game_over
+
+    def new_dino_color(self,image):
+        #image = pyautogui.screenshot(region=(self.lx+25,self.ly, 50, self.ry-self.ly-10))
+        size = image.size
+        DinoColor = image.getpixel((size[0]-40,15))
+        th= np.array(image)
+        to_compare = image.getpixel((1,1))
+        count=0
+        for i in range(size[1]):
+            if not th[-i][50][0] == to_compare[0]:
+                count+=1
+                if count == 4:
+                    DinoColor = th[-i][50]
+                    #print(DinoColor)
+                    return DinoColor
+        #print(DinoColor)
+        return DinoColor
 
     def __next_obstacle_dist(self,game_over):
         s = 0
         length = 0
         height=0
         image = pyautogui.screenshot(region=(self.lx,self.ly, self.rx-self.lx+160, self.ry-self.ly-10))
+        DinoColor = self.new_dino_color(image)
         size = image.size
-        DinoColor = image.getpixel((size[0]-40,15))
-        if self.inte == 0:
-            self.hist_color_dino[0]=DinoColor[0]
-            self.inte+=1
-        elif self.inte == self.hist_color_dino.size:
-            self.inte=0
-            self.hist_color_dino[0]=DinoColor[0]
-        else:
-            self.hist_color_dino[self.inte]=DinoColor[0]
-            self.inte+=1
-        self.hist_color_dino.sort()
-        aux=0
-        aux2=0
-        DinoColor = [0,0,0]
-        DinoColor_aux = [0,0,0]
-        for j in range(1,self.hist_color_dino.size):
-            if self.hist_color_dino[j] == self.hist_color_dino[j-1]:
-                DinoColor[0]=self.hist_color_dino[j-1]
-                DinoColor[1]=self.hist_color_dino[j-1]
-                DinoColor[2]=self.hist_color_dino[j-1]
-                aux+=1
-            elif aux >= aux2:
-                DinoColor_aux[0]=self.hist_color_dino[j-1]
-                DinoColor_aux[1]=self.hist_color_dino[j-1]
-                DinoColor_aux[2]=self.hist_color_dino[j-1]
-                aux2=aux
-                aux=0
-        if aux2 > aux:
-            DinoColor=DinoColor_aux
-        image = pyautogui.screenshot(region=(self.lx,self.ly, self.rx-self.lx, self.ry-self.ly-10))
         image = np.array(image)
         th = compare(image,DinoColor)
         x_aux=1000000
-        count=0
-        opa, contours, _= cv2.findContours(th,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        count=1
+        _, contours, _= cv2.findContours(th,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         if len(contours) > 1:
             for c in contours:
                 x,y,w,h = cv2.boundingRect(c)
-                if cv2.contourArea(c)>900 and cv2.contourArea(c)<1000:
-                    if (x > size[0]/2-30) and (y < size[1]-10):
+                if cv2.contourArea(c)>850 and cv2.contourArea(c)<1000:
+                    if (x > size[0]/2-50) and (y < size[1]-10):
                         game_over=True
-                        print("Game Over")
-                        return 1000000,game_over,0, 0
-
+                        print("Game Over!!!")
+                        return 286,game_over,0, 0
                 if cv2.contourArea(c)>120 and cv2.contourArea(c)<450:
                     if abs(x_aux-x) < 30 :
                         count+=1
                     if x < x_aux and x >70:
                         length=w
                         x_aux=x
-                        height=size[1]-y
+                        if not y+h >= size[1]-15:
+                            height=size[1]-(h+y)
             if x_aux > 70 and x_aux < size[0]:
                 return (x_aux-70), game_over, length*count, height
 
-        return 10000000,game_over,0, 0
+        return 286,game_over,0, 0
 
     def reset(self):
         self.last_obstacle = {}
+        self.last_speed=0
         self.__current_fitness = 0
         self.__change_fitness = False
 
